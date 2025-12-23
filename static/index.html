@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Who Wants to Be a Millionaire</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c2461, #1e3799);
+            color: white;
+            min-height: 100vh;
+            padding: 10px;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 10px;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 15px 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            margin-bottom: 15px;
+            border: 2px solid #fbc531;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fbc531;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            margin-bottom: 5px;
+        }
+        
+        .score-board {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #fbc531;
+        }
+        
+        .score-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .score-item {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .score-label {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        .score-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #fbc531;
+        }
+        
+        .prize-ladder {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .prize-item {
+            padding: 8px;
+            margin: 3px 0;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+        }
+        
+        .prize-item.current {
+            background: #fbc531;
+            color: #000;
+            font-weight: bold;
+        }
+        
+        .prize-item.passed {
+            background: #4cd137;
+            color: #000;
+        }
+        
+        .prize-item.future {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .question-container {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 2px solid #fbc531;
+        }
+        
+        .question-number {
+            font-size: 14px;
+            color: #fbc531;
+            margin-bottom: 5px;
+        }
+        
+        .question-text {
+            font-size: 18px;
+            line-height: 1.4;
+            margin-bottom: 20px;
+            min-height: 80px;
+        }
+        
+        .options-container {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .option {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #4a69bd;
+            border-radius: 10px;
+            padding: 15px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+        }
+        
+        .option:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .option.selected {
+            background: #4a69bd;
+            border-color: #fbc531;
+        }
+        
+        .option.correct {
+            background: #4cd137;
+            border-color: #4cd137;
+            color: #000;
+        }
+        
+        .option.wrong {
+            background: #e84118;
+            border-color: #e84118;
+            color: #000;
+        }
+        
+        .option-label {
+            background: #fbc531;
+            color: #000;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+        
+        .lifelines {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .lifeline-btn {
+            background: #8c7ae6;
+            border: none;
+            border-radius: 25px;
+            padding: 10px 15px;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex: 1;
+            min-width: 100px;
+            max-width: 150px;
+        }
+        
+        .lifeline-btn:disabled {
+            background: #7f8fa6;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+        
+        .lifeline-btn:hover:not(:disabled) {
+            background: #9c88ff;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-submit {
+            background: #4cd137;
+            color: white;
+        }
+        
+        .btn-quit {
+            background: #e84118;
+            color: white;
+        }
+        
+        .btn-start {
+            background: #fbc531;
+            color: #000;
+            width: 100%;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .modal-content {
+            background: #1e3799;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            border: 3px solid #fbc531;
+            text-align: center;
+        }
+        
+        .modal-title {
+            color: #fbc531;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        
+        .modal-message {
+            font-size: 18px;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+        
+        .audience-poll {
+            display: grid;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .poll-item {
+            display: flex;
+            align-items: center;
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        .poll-bar {
+            height: 20px;
+            background: #fbc531;
+            border-radius: 3px;
+            margin-left: 10px;
+            transition: width 1s;
+        }
+        
+        @media (max-width: 480px) {
+            .question-text {
+                font-size: 16px;
+            }
+            
+            .option {
+                padding: 12px;
+                font-size: 14px;
+            }
+            
+            .btn {
+                padding: 12px;
+                font-size: 14px;
+            }
+            
+            .lifeline-btn {
+                font-size: 12px;
+                padding: 8px 12px;
+            }
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .loading-spinner {
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid #fbc531;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .game-screen {
+            display: none;
+        }
+        
+        .start-screen {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .start-title {
+            font-size: 32px;
+            color: #fbc531;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+        
+        .instructions {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 30px 0;
+            text-align: left;
+        }
+        
+        .instructions h3 {
+            color: #fbc531;
+            margin-bottom: 10px;
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 10px;
+        }
+        
+        .lifelines-info {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .lifeline-info {
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 10px;
+            width: 120px;
+            text-align: center;
+        }
+        
+        .lifeline-info h4 {
+            color: #fbc531;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Start Screen -->
+        <div class="start-screen" id="startScreen">
+            <div class="header">
+                <div class="logo">WHO WANTS TO BE A MILLIONAIRE</div>
+            </div>
+            
+            <div class="start-title">
+                🎮 Siap Menjadi Jutawan? 🎮
+            </div>
+            
+            <div class="instructions">
+                <h3>📋 Cara Bermain:</h3>
+                <ul>
+                    <li>Jawab 11 pertanyaan untuk memenangkan 1 MILYAR!</li>
+                    <li>Setiap jawaban benar akan meningkatkan hadiah Anda</li>
+                    <li>Anda memiliki 3 lifeline untuk membantu:</li>
+                </ul>
+                
+                <div class="lifelines-info">
+                    <div class="lifeline-info">
+                        <h4>50:50</h4>
+                        <p>Hilangkan 2 jawaban salah</p>
+                    </div>
+                    <div class="lifeline-info">
+                        <h4>Telepon Teman</h4>
+                        <p>Konsultasi dengan teman</p>
+                    </div>
+                    <div class="lifeline-info">
+                        <h4>Tanya Penonton</h4>
+                        <p>Lihat polling penonton</p>
+                    </div>
+                </div>
+                
+                <p><strong>💡 Tip:</strong> Anda bisa berhenti kapan saja dan bawa pulang hadiah yang sudah dijamin!</p>
+            </div>
+            
+            <button class="btn btn-start" onclick="startGame()">
+                🚀 MULAI PERMAINAN
+            </button>
+        </div>
+        
+        <!-- Game Screen -->
+        <div class="game-screen" id="gameScreen">
+            <div class="header">
+                <div class="logo">MILLIONAIRE</div>
+                <div>Level: <span id="currentLevel">1</span>/11</div>
+            </div>
+            
+            <div class="score-board">
+                <div class="score-info">
+                    <div class="score-item">
+                        <div class="score-label">HADIAH SAAT INI</div>
+                        <div class="score-value" id="currentPrize">Rp 0</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-label">HADIAH DIJAMIN</div>
+                        <div class="score-value" id="guaranteedPrize">Rp 0</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="prize-ladder" id="prizeLadder">
+                <!-- Prize ladder will be populated by JavaScript -->
+            </div>
+            
+            <div class="question-container">
+                <div class="question-number">PERTANYAAN #<span id="questionNumber">1</span></div>
+                <div class="question-text" id="questionText">Memuat pertanyaan...</div>
+                
+                <div class="options-container" id="optionsContainer">
+                    <!-- Options will be populated by JavaScript -->
+                </div>
+                
+                <div class="lifelines">
+                    <button class="lifeline-btn" id="lifeline5050" onclick="useLifeline('50_50')">
+                        50:50
+                    </button>
+                    <button class="lifeline-btn" id="lifelinePhone" onclick="useLifeline('phone_friend')">
+                        📞 Telepon Teman
+                    </button>
+                    <button class="lifeline-btn" id="lifelineAudience" onclick="useLifeline('ask_audience')">
+                        👥 Tanya Penonton
+                    </button>
+                </div>
+                
+                <div class="controls">
+                    <button class="btn btn-quit" onclick="quitGame()">
+                        ❌ BERHENTI
+                    </button>
+                    <button class="btn btn-submit" onclick="submitAnswer()" id="submitBtn">
+                        ✅ JAWAB
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Loading Indicator -->
+        <div class="loading" id="loading">
+            <div class="loading-spinner"></div>
+            <p>Memuat...</p>
+        </div>
+        
+        <!-- Modals -->
+        <div class="modal" id="resultModal">
+            <div class="modal-content">
+                <div class="modal-title" id="resultTitle">HASIL</div>
+                <div class="modal-message" id="resultMessage"></div>
+                <button class="btn btn-start" onclick="closeModal()">
+                    OK
+                </button>
+            </div>
+        </div>
+        
+        <div class="modal" id="lifelineModal">
+            <div class="modal-content">
+                <div class="modal-title" id="lifelineTitle">LIFELINE</div>
+                <div class="modal-message" id="lifelineMessage"></div>
+                <div id="audiencePollContainer" class="audience-poll" style="display: none;">
+                    <!-- Audience poll results will be shown here -->
+                </div>
+                <button class="btn btn-start" onclick="closeLifelineModal()">
+                    TUTUP
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentQuestion = null;
+        let selectedOption = null;
+        let gameState = {
+            currentLevel: 1,
+            score: 0,
+            guaranteedPrize: 0
+        };
+        
+        const API_BASE = window.location.origin;
+        
+        function formatRupiah(amount) {
+            return 'Rp ' + amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
+        
+        async function startGame() {
+            showLoading();
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/game/start`);
+                const data = await response.json();
+                
+                document.getElementById('startScreen').style.display = 'none';
+                document.getElementById('gameScreen').style.display = 'block';
+                
+                // Initialize prize ladder
+                initializePrizeLadder(data.prize_levels);
+                
+                // Load first question
+                await loadQuestion(1);
+                
+                hideLoading();
+            } catch (error) {
+                console.error('Error starting game:', error);
+                hideLoading();
+                showResult('Error', 'Gagal memulai permainan. Silakan refresh halaman.');
+            }
+        }
+        
+        function initializePrizeLadder(prizeLevels) {
+            const ladder = document.getElementById('prizeLadder');
+            ladder.innerHTML = '';
+            
+            prizeLevels.forEach((prize, index) => {
+                const prizeItem = document.createElement('div');
+                prizeItem.className = 'prize-item future';
+                prizeItem.id = `prizeLevel${index + 1}`;
+                
+                const levelText = document.createElement('span');
+                levelText.textContent = `Level ${index + 1}`;
+                
+                const prizeText = document.createElement('span');
+                prizeText.textContent = formatRupiah(prize);
+                
+                prizeItem.appendChild(levelText);
+                prizeItem.appendChild(prizeText);
+                ladder.appendChild(prizeItem);
+            });
+        }
+        
+        async function loadQuestion(level) {
+            showLoading();
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/questions/${level}`);
+                currentQuestion = await response.json();
+                
+                document.getElementById('questionNumber').textContent = level;
+                document.getElementById('questionText').textContent = currentQuestion.question;
+                
+                // Update current level display
+                document.getElementById('currentLevel').textContent = level;
+                
+                // Update prize ladder
+                updatePrizeLadder(level);
+                
+                // Display options
+                displayOptions(currentQuestion.options);
+                
+                // Reset selected option
+                selectedOption = null;
+                document.getElementById('submitBtn').disabled = true;
+                
+                // Get game state
+                await updateGameState();
+                
+                hideLoading();
+            } catch (error) {
+                console.error('Error loading question:', error);
+                hideLoading();
+                showResult('Error', 'Gagal memuat pertanyaan.');
+            }
+        }
+        
+        function displayOptions(options) {
+            const container = document.getElementById('optionsContainer');
+            container.innerHTML = '';
+            
+            const labels = ['A', 'B', 'C', 'D'];
+            
+            options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                optionElement.dataset.index = index;
+                
+                optionElement.innerHTML = `
+                    <div class="option-label">${labels[index]}</div>
+                    <div class="option-text">${option}</div>
+                `;
+                
+                optionElement.onclick = () => selectOption(index);
+                container.appendChild(optionElement);
+            });
+        }
+        
+        function selectOption(index) {
+            // Deselect all options
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Select clicked option
+            const selectedElement = document.querySelector(`.option[data-index="${index}"]`);
+            selectedElement.classList.add('selected');
+            selectedOption = index;
+            
+            // Enable submit button
+            document.getElementById('submitBtn').disabled = false;
+        }
+        
+        async function submitAnswer() {
+            if (selectedOption === null) return;
+            
+            showLoading();
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/game/answer?question_id=${currentQuestion.id}&answer_index=${selectedOption}`, {
+                    method: 'POST'
+                });
+                
+                const result = await response.json();
+                
+                if (result.correct) {
+                    // Show correct answer
+                    document.querySelectorAll('.option').forEach((opt, index) => {
+                        if (index === currentQuestion.correct_answer) {
+                            opt.classList.add('correct');
+                        }
+                    });
+                    
+                    // Wait a moment then proceed to next question
+                    setTimeout(async () => {
+                        if (gameState.currentLevel >= 11) {
+                            showResult('🎉 SELAMAT! 🎉', 
+                                `Anda memenangkan ${formatRupiah(result.total_score)}! 
+                                Anda sekarang adalah JUTAWAN!`);
+                        } else {
+                            await loadQuestion(gameState.currentLevel + 1);
+                        }
+                    }, 2000);
+                } else {
+                    // Show correct and wrong answers
+                    document.querySelectorAll('.option').forEach((opt, index) => {
+                        if (index === currentQuestion.correct_answer) {
+                            opt.classList.add('correct');
+                        }
+                        if (index === selectedOption) {
+                            opt.classList.add('wrong');
+                        }
+                    });
+                    
+                    // Show game over modal
+                    setTimeout(() => {
+                        showResult('⏰ WAKTU HABIS ⏰',
+                            `Jawaban Anda salah! 
+                            Hadiah yang Anda bawa pulang: ${formatRupiah(result.prize_won)}`);
+                    }, 2000);
+                }
+                
+                hideLoading();
+            } catch (error) {
+                console.error('Error submitting answer:', error);
+                hideLoading();
+                showResult('Error', 'Gagal mengirim jawaban.');
+            }
+        }
+        
+        async function useLifeline(lifelineName) {
+            showLoading();
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/lifelines/${lifelineName}?question_id=${currentQuestion.id}`, {
+                    method: 'POST'
+                });
+                
+                const result = await response.json();
+                
+                // Disable the lifeline button
+                document.getElementById(`lifeline${lifelineName.charAt(0).toUpperCase() + lifelineName.slice(1)}`).disabled = true;
+                
+                // Apply lifeline effect
+                if (lifelineName === '50_50') {
+                    apply5050Lifeline(result.remaining_options);
+                    showLifelineResult('50:50', '2 jawaban salah telah dihilangkan!');
+                } else if (lifelineName === 'phone_friend') {
+                    const labels = ['A', 'B', 'C', 'D'];
+                    showLifelineResult('Telepon Teman', 
+                        `Teman Anda merekomendasikan: ${labels[result.suggestion]}`);
+                } else if (lifelineName === 'ask_audience') {
+                    showAudiencePoll(result.audience_poll);
+                }
+                
+                hideLoading();
+            } catch (error) {
+                console.error('Error using lifeline:', error);
+                hideLoading();
+                showResult('Error', 'Gagal menggunakan lifeline.');
+            }
+        }
+        
+        function apply5050Lifeline(remainingOptions) {
+            document.querySelectorAll('.option').forEach((opt, index) => {
+                if (!remainingOptions.includes(index)) {
+                    opt.style.opacity = '0.3';
+                    opt.style.pointerEvents = 'none';
+                }
+            });
+        }
+        
+        function showAudiencePoll(pollResults) {
+            const container = document.getElementById('audiencePollContainer');
+            container.innerHTML = '';
+            container.style.display = 'block';
+            
+            const labels = ['A', 'B', 'C', 'D'];
+            
+            pollResults.forEach((percentage, index) => {
+                const pollItem = document.createElement('div');
+                pollItem.className = 'poll-item';
+                
+                pollItem.innerHTML = `
+                    <span>${labels[index]}: ${percentage}%</span>
+                    <div class="poll-bar" style="width: ${percentage}%"></div>
+                `;
+                
+                container.appendChild(pollItem);
+            });
+            
+            document.getElementById('lifelineTitle').textContent = 'Polling Penonton';
+            document.getElementById('lifelineMessage').textContent = 'Penonton memilih:';
+            document.getElementById('lifelineModal').style.display = 'flex';
+        }
+        
+        async function quitGame() {
+            if (confirm('Apakah Anda yakin ingin berhenti dan mengambil hadiah?')) {
+                showLoading();
+                
+                try {
+                    const response = await fetch(`${API_BASE}/api/game/quit`, {
+                        method: 'POST'
+                    });
+                    
+                    const result = await response.json();
+                    
+                    showResult('🏆 SELESAI 🏆',
+                        `Permainan selesai! 
+                        Hadiah yang Anda bawa pulang: ${formatRupiah(result.prize_won)}`);
+                    
+                    hideLoading();
+                } catch (error) {
+                    console.error('Error quitting game:', error);
+                    hideLoading();
+                    showResult('Error', 'Gagal mengakhiri permainan.');
+                }
+            }
+        }
+        
+        async function updateGameState() {
+            try {
+                const response = await fetch(`${API_BASE}/api/game/state`);
+                const state = await response.json();
+                
+                gameState = {
+                    currentLevel: state.current_question + 1,
+                    score: state.score,
+                    guaranteedPrize: state.guaranteed_prize
+                };
+                
+                // Update display
+                document.getElementById('currentPrize').textContent = formatRupiah(state.score);
+                document.getElementById('guaranteedPrize').textContent = formatRupiah(state.guaranteed_prize);
+            } catch (error) {
+                console.error('Error updating game state:', error);
+            }
+        }
+        
+        function updatePrizeLadder(currentLevel) {
+            // Reset all prize items
+            document.querySelectorAll('.prize-item').forEach((item, index) => {
+                item.className = 'prize-item';
+                
+                if (index + 1 < currentLevel) {
+                    item.classList.add('passed');
+                } else if (index + 1 === currentLevel) {
+                    item.classList.add('current');
+                } else {
+                    item.classList.add('future');
+                }
+            });
+        }
+        
+        function showResult(title, message) {
+            document.getElementById('resultTitle').textContent = title;
+            document.getElementById('resultMessage').textContent = message;
+            document.getElementById('resultModal').style.display = 'flex';
+        }
+        
+        function showLifelineResult(title, message) {
+            document.getElementById('lifelineTitle').textContent = title;
+            document.getElementById('lifelineMessage').textContent = message;
+            document.getElementById('audiencePollContainer').style.display = 'none';
+            document.getElementById('lifelineModal').style.display = 'flex';
+        }
+        
+        function closeModal() {
+            document.getElementById('resultModal').style.display = 'none';
+            // Restart game
+            location.reload();
+        }
+        
+        function closeLifelineModal() {
+            document.getElementById('lifelineModal').style.display = 'none';
+        }
+        
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+        }
+        
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+        
+        // Initialize lifelines
+        async function initializeLifelines() {
+            try {
+                const response = await fetch(`${API_BASE}/api/lifelines`);
+                const lifelines = await response.json();
+                
+                // Enable all lifelines initially
+                Object.keys(lifelines).forEach(lifeline => {
+                    const btn = document.getElementById(`lifeline${lifeline.charAt(0).toUpperCase() + lifeline.slice(1)}`);
+                    if (btn) {
+                        btn.disabled = false;
+                    }
+                });
+            } catch (error) {
+                console.error('Error initializing lifelines:', error);
+            }
+        }
+        
+        // Initialize when page loads
+        window.onload = function() {
+            initializeLifelines();
+        };
+    </script>
+</body>
+  </html>
